@@ -1,10 +1,5 @@
 import re
- 
-def str(s):
-    txt = re.compile(r'\w+_\w+')
-    x = txt.findall(s)
-    print(x)
 
-p = input()
-str(p)
-
+txt = input()
+x = re.findall(r'[a-n]_[a-n]', txt)
+print(x)

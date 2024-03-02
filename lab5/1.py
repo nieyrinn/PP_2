@@ -1,12 +1,5 @@
 import re
 
-def str():
-    s = input()
-    txt = re.compile(r'a+b*')
-    x = txt.fullmatch(s)
-    if x:
-        print("yes")
-    else:
-        print("no")
-
-str()
+txt = input()
+x = re.findall(r'a+b*', txt)
+print(x)

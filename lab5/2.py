@@ -1,12 +1,5 @@
 import re
 
-def str(s):
-    txt = re.compile(r'a(bb|bbb)')
-    x = txt.match(s)
-    if x:
-        print("Yes")
-    else:
-        print("No")
-
-p = input()
-str(p)
+txt = input()
+x = re.findall(r'a+bb|bbb', txt)
+print(x)
