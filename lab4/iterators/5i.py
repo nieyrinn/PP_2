@@ -1,10 +1,8 @@
-def f(n):
+def f():
+    n = int(input())
     while n >= 0:
         yield n
         n -= 1
 
-n = int(input())
-
-# Generate and print countdown using the generator
-for number in f(n):
-    print(number)
+for x in f():
+    print(x)

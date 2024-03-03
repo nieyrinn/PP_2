@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
-
-s = input()
-user = datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
-
-d = user.replace(microsecond=0)
-
-print("Original Datetime:", user)
-print("Datetime without Microseconds:", d)
+#write a python program to calculate two date difference in seconds
+import datetime
+date1 = datetime.datetime(2022, 1, 1, 12, 0, 0)
+date2 = datetime.datetime(2022, 1, 2, 12, 0, 0)
+d = date2 - date1
+seconds = d.total_seconds()
+print(seconds)

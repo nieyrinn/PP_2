@@ -1,11 +1,8 @@
-def n():
-    N = int(input()) #мы инпутим какое то число
-    for i in range(N): 
-        yield i ** 2 #мы возвращаем квадрат каждого элемента 
+def square():
+    n = int(input()) 
+    for i in range(n + 1): 
+        yield i ** 2 
 
-# Using the generator
-sq = n() #
+for x in square():
+    print(x)
 
-# Fetch values one at a time
-for square in sq:
-    print(square)
