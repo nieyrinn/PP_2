@@ -2,10 +2,10 @@ import pygame
 import time
 import random
 
-snake_speed = 10
+snake_speed = 15
 
 # размер окна
-window_x = 640
+window_x = 720
 window_y = 480
 
 # определение цветов
@@ -19,21 +19,25 @@ blue = pygame.Color(0, 0, 255)
 pygame.init()
 
 # Инициализирование игрового окно
-pygame.display.set_caption('SNAKE')
+pygame.display.set_caption('Змейка')
 game_window = pygame.display.set_mode((window_x, window_y))
 
 # Контроллер FPS (кадры в секунду)
 fps = pygame.time.Clock()
 
 # определение положения змеи по умолчанию
-snake_position = [200, 100]
+snake_position = [100, 50]
 
 # определение первых 4 блоков тела змеи
-snake_body = [[200, 100],[190, 90],[180, 80],[170, 70]]
+snake_body = [[100, 50],
+              [90, 50],
+              [80, 50],
+              [70, 50]
+              ]
 
 # fruit position
-fruit_position = [random.randrange(1, (window_x // 20)) * 20,
-                  random.randrange(1, (window_y // 20)) * 20]
+fruit_position = [random.randrange(1, (window_x // 10)) * 10,
+                  random.randrange(1, (window_y // 10)) * 10]
 
 fruit_spawn = True
 
@@ -124,13 +128,13 @@ while True :
 
     # Перемещение змеи
     if direction == 'UP' :
-        snake_position[1] -= 20
+        snake_position[1] -= 10
     if direction == 'DOWN' :
-        snake_position[1] += 20
+        snake_position[1] += 10
     if direction == 'LEFT' :
-        snake_position[0] -= 20
+        snake_position[0] -= 10
     if direction == 'RIGHT' :
-        snake_position[0] += 20
+        snake_position[0] += 10
 
     # Механизм роста тела змеи
     # если фрукты и змеи сталкиваются, то очки
@@ -143,50 +147,28 @@ while True :
         snake_body.pop()
 
     if not fruit_spawn :
-        fruit_position = [random.randrange(1, (window_x // 20)) * 20,
-                          random.randrange(1, (window_y // 20)) * 20]
+        fruit_position = [random.randrange(1, (window_x // 10)) * 10,
+                          random.randrange(1, (window_y // 10)) * 10]
 
     fruit_spawn = True
     game_window.fill(black)
 
-    for pos in snake_body:
-        pygame.draw.rect(game_window, green, pygame.Rect(pos[0], pos[1], 20, 20))
-
+    for pos in snake_body :
+        pygame.draw.rect(game_window, green,
+                         pygame.Rect(pos[0], pos[1], 10, 10))
     pygame.draw.rect(game_window, white, pygame.Rect(
-        fruit_position[0], fruit_position[1], 20, 20))
+        fruit_position[0], fruit_position[1], 10, 10))
 
     # Game Over conditions
-    if snake_position[0] < 0 or snake_position[0] > window_x - 20 :
+    if snake_position[0] < 0 or snake_position[0] > window_x - 10 :
         game_over()
-    if snake_position[1] < 0 or snake_position[1] > window_y - 20 :
+    if snake_position[1] < 0 or snake_position[1] > window_y - 10 :
         game_over()
 
     # Touching the snake body
     for block in snake_body[1 :] :
         if snake_position[0] == block[0] and snake_position[1] == block[1] :
             game_over()
-    
-    def load_level(file_name):
-        level_blocks = []
-        with open(file_name, 'r') as file:
-            for y, line in enumerate(file):
-                for x, char in enumerate(line.strip()):
-                    if char == '4':
-                        level_blocks.append([x * 20, y * 20])  # Размер блока 20x20
-        return level_blocks
-    
-    # Загрузка уровня из файла
-    level_blocks = load_level('level0.txt')
-
-    # Отрисовка блоков уровня
-    for block in level_blocks:
-        pygame.draw.rect(game_window, blue, pygame.Rect(block[0], block[1], 20, 20))
-
-    # Обновляем логику коллизий
-    for block in level_blocks:
-        if snake_position[0] == block[0] and snake_position[1] == block[1]:
-            game_over()
-
 
     # displaying score countinuously
     show_score(1, white, 'times new roman', 20)
