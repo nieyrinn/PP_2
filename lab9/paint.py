@@ -1,119 +1,108 @@
 import pygame
+import random
 
-# Initialize pygame
+# Инициализация Pygame
 pygame.init()
 
-# Set up the display
-screen_width = 800
-screen_height = 600
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Paint")
+# Размеры экрана
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
-# Set up the colors
-BLACK = (0, 0, 0)
+# Цвета
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-# Set up the tools
-tool = "brush"
-brush_size = 10
-eraser_size = 10
-color = BLACK
+# Размеры сегмента змеи
+SEGMENT_WIDTH = 20
+SEGMENT_HEIGHT = 20
 
-# Set up the drawing surface
-drawing_surface = pygame.Surface((screen_width, screen_height))
-drawing_surface.fill(WHITE)
+# Размеры фрукта
+FRUIT_SIZE = 20
 
-# Set up the font
-font = pygame.font.Font(None, 30)
+# Создание экрана
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Colorful Snake")
 
-def draw_continuous(tool, size, color):
-    if tool == "brush":
-        mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0]:
-            pygame.draw.circle(drawing_surface, color, mouse_pos, size)
-    elif tool == "circle":
-        mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0]:
-            pygame.draw.circle(drawing_surface, color, mouse_pos, 50)
-    elif tool == "rectangle":
-        mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0]:
-            pygame.draw.rect(drawing_surface, color, pygame.Rect(mouse_pos, (100, 50)))
-    elif tool == "eraser":
-        mouse_pos = pygame.mouse.get_pos()
-        if pygame.mouse.get_pressed()[0]:
-            pygame.draw.circle(drawing_surface, WHITE, mouse_pos, size)
+# Функция рисования змеи
+def draw_snake(snake_segments):
+    for segment in snake_segments:
+        pygame.draw.rect(screen, segment['color'], segment['rect'])
 
-# Set up the game loop
-running = True
-while running:
-    draw_continuous(tool, brush_size, color)
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_b:
-                tool = "brush"
-            elif event.key == pygame.K_c:
-                tool = "circle"
-            elif event.key == pygame.K_r:
-                tool = "rectangle"
-            elif event.key == pygame.K_e:
-                tool = "eraser"
-            elif event.key == pygame.K_s:
-                pygame.image.save(drawing_surface, "drawing.png")
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                if tool == "brush":
-                    pygame.draw.circle(drawing_surface, color, event.pos, brush_size)
-                elif tool == "circle":
-                    pygame.draw.circle(drawing_surface, color, event.pos, 50)
-                elif tool == "rectangle":
-                    pygame.draw.rect(drawing_surface, color, pygame.Rect(event.pos, (100, 50)))
-                elif tool == "eraser":
-                    pygame.draw.circle(drawing_surface, WHITE, event.pos, eraser_size)
+# Функция для генерации случайного цвета, исключая предыдущий цвет
+def random_color(previous_color):
+    colors = [RED, GREEN, BLUE]
+    colors.remove(previous_color)
+    return random.choice(colors)
 
-    # Draw the background
-    screen.fill(WHITE)
+# Функция создания фрукта
+def create_fruit():
+    x = random.randrange(0, SCREEN_WIDTH - FRUIT_SIZE, FRUIT_SIZE)
+    y = random.randrange(0, SCREEN_HEIGHT - FRUIT_SIZE, FRUIT_SIZE)
+    return pygame.Rect(x, y, FRUIT_SIZE, FRUIT_SIZE)
 
-    # Draw the drawing surface
-    screen.blit(drawing_surface, (0, 0))
+# Главная функция игры
+def main():
+    clock = pygame.time.Clock()
 
-    # Draw the tool and color indicators
-    tool_text = font.render("Tool: " + tool.capitalize(), True, BLACK)
-    screen.blit(tool_text, (10, 10))
-    color_text = font.render("Color: " + str(color), True, BLACK)
-    screen.blit(color_text, (10, 40))
+    # Начальная позиция змеи
+    start_x = SCREEN_WIDTH // 2
+    start_y = SCREEN_HEIGHT // 2
 
-    # Draw the brush/eraser size indicator
-    if tool == "brush" or tool == "eraser":
-        size_text = font.render("Size: " + str(brush_size), True, BLACK)
-        screen.blit(size_text, (10, 70))    
+    # Сегменты змеи
+    snake_segments = [{'rect': pygame.Rect(start_x, start_y, SEGMENT_WIDTH, SEGMENT_HEIGHT), 'color': random.choice([RED, GREEN, BLUE])}]
+    direction = 'left'
 
-    # Draw the color selection buttons
-    pygame.draw.rect(screen, RED, pygame.Rect(screen_width - 80, 10, 30, 30))
-    pygame.draw.rect(screen, GREEN, pygame.Rect(screen_width - 40, 10, 30, 30))
-    pygame.draw.rect(screen, BLUE, pygame.Rect(screen_width - 80, 50, 30, 30))
-    pygame.draw.rect(screen, BLACK, pygame.Rect(screen_width - 40, 50, 30, 30))
+    # Фрукт
+    fruit = create_fruit()
 
-    # Handle input
-    mouse_pos = pygame.mouse.get_pos()
-    if pygame.mouse.get_pressed()[0]:
-        if screen_width - 80 <= mouse_pos[0] <= screen_width - 50 and 10 <= mouse_pos[1] <= 40:
-            color = RED
-        elif screen_width - 40 <= mouse_pos[0] <= screen_width - 10 and 10 <= mouse_pos[1] <= 40:
-            color = GREEN
-        elif screen_width - 80 <= mouse_pos[0] <= screen_width - 50 and 50 <= mouse_pos[1] <= 80:
-            color = BLUE
-        elif screen_width - 40 <= mouse_pos[0] <= screen_width - 10 and 50 <= mouse_pos[1] <= 80:
-            color = BLACK
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
 
-    # Update the screen
-    pygame.display.flip()
+        # Управление змеей
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP] and direction != 'down':
+            direction = 'up'
+        elif keys[pygame.K_DOWN] and direction != 'up':
+            direction = 'down'
+        elif keys[pygame.K_LEFT] and direction != 'right':
+            direction = 'left'
+        elif keys[pygame.K_RIGHT] and direction != 'left':
+            direction = 'right'
 
-# Quit pygame
-pygame.quit()
+        # Перемещение змеи
+        if direction == 'up':
+            new_head = {'rect': pygame.Rect(snake_segments[0]['rect'].x, snake_segments[0]['rect'].y - SEGMENT_HEIGHT, SEGMENT_WIDTH, SEGMENT_HEIGHT), 'color': random.choice([RED, GREEN, BLUE])}
+        elif direction == 'down':
+            new_head = {'rect': pygame.Rect(snake_segments[0]['rect'].x, snake_segments[0]['rect'].y + SEGMENT_HEIGHT, SEGMENT_WIDTH, SEGMENT_HEIGHT), 'color': random.choice([RED, GREEN, BLUE])}
+        elif direction == 'left':
+            new_head = {'rect': pygame.Rect(snake_segments[0]['rect'].x - SEGMENT_WIDTH, snake_segments[0]['rect'].y, SEGMENT_WIDTH, SEGMENT_HEIGHT), 'color': random.choice([RED, GREEN, BLUE])}
+        elif direction == 'right':
+            new_head = {'rect': pygame.Rect(snake_segments[0]['rect'].x + SEGMENT_WIDTH, snake_segments[0]['rect'].y, SEGMENT_WIDTH, SEGMENT_HEIGHT), 'color': random.choice([RED, GREEN, BLUE])}
+
+        # Добавление новой головы змеи
+        snake_segments.insert(0, new_head)
+
+        # Если змея съела фрукт
+        if snake_segments[0]['rect'].colliderect(fruit):
+            fruit = create_fruit()
+        else:
+            # Удаление хвоста змеи
+            snake_segments.pop()
+
+        # Отрисовка экрана
+        screen.fill(WHITE)
+        pygame.draw.rect(screen, RED, fruit)
+        draw_snake(snake_segments)
+        pygame.display.flip()
+
+        # Ограничение количества кадров в секунду
+        clock.tick(10)
+
+if __name__ == "__main__":
+    main()

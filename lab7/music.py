@@ -47,9 +47,9 @@ while True:
                     stop_song()
                 else:
                     play_song()
-            elif event.key == pygame.K_n:
+            elif event.key == pygame.K_RIGHT:
                 next_song()
-            elif event.key == pygame.K_p:
+            elif event.key == pygame.K_LEFT:
                 prev_song()
     
     screen.fill((255, 255, 255))
