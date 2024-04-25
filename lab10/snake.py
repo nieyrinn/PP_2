@@ -1,6 +1,10 @@
 # Media files taken from "Snake III" game 
 
-import pygame, random, time, sys, psycopg2
+import pygame
+import random
+import time
+import sys
+import psycopg2
 from threading import Timer
 
 pygame.init()
@@ -20,15 +24,14 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # Some variables
-SPEED = 10
+SPEED = 1
 SCORE = 0
 LEVEL = 0
 x = 0
 
 # Establish connection to the PostgreSQL database
-conn = psycopg2.connect(database="suppliers", user="nieyrinn", password="nazyken13", host="localhost", port="5432")
+conn = psycopg2.connect(database="mydatabase", user="postgres", password="nazyken13", host="localhost", port="5432")
 cur = conn.cursor()
-
 # Create tables for Snake
 cur.execute('''CREATE TABLE IF NOT EXISTS players (
                 id SERIAL PRIMARY KEY,
@@ -37,8 +40,8 @@ cur.execute('''CREATE TABLE IF NOT EXISTS players (
                 level TEXT NOT NULL)''')
 
 # Creating a green screen and caption of game
-pygame.display.set_caption("Snakes III?")
-pygame.display.set_icon(pygame.image.load("tsis8/snake/icon.png"))
+pygame.display.set_caption("SNAKE")
+pygame.display.set_icon(pygame.image.load("/Users/nieyrinn/Desktop/PP2/lab10/snake/icon.png"))
 DISPLAYSURF = pygame.display.set_mode((res))
 
 startdirection = 'RIGHT'
@@ -49,19 +52,19 @@ snake_pos = [50, 50]
 snake_body = [[50, 50],[40, 50]]
 
 # fruit
-fruit = pygame.transform.scale(pygame.image.load("tsis8/snake/food.png"), (20, 10))
+fruit = pygame.transform.scale(pygame.image.load("/Users/nieyrinn/Desktop/PP2/lab10/snake/food.png"), (20, 10))
 fruit_pos = [random.randrange(1, (w//10)) * 10, random.randrange(1, (h//10)) * 10]
 fruit_spawn = True
 # fruit2
-fruit2 = pygame.transform.scale(pygame.image.load("tsis8/snake/food2.png"), (20, 10))
+fruit2 = pygame.transform.scale(pygame.image.load("/Users/nieyrinn/Desktop/PP2/lab10/snake/food2.png"), (20, 10))
 fruit2_pos = [random.randrange(1, (w//10)) * 10, random.randrange(1, (h//10)) * 10]
 fruit2_spawn = True
 # fruit3
-fruit3 = pygame.transform.scale(pygame.image.load("tsis8/snake/food3.png"), (20, 10))
+fruit3 = pygame.transform.scale(pygame.image.load("/Users/nieyrinn/Desktop/PP2/lab10/snake/food3.png"), (20, 10))
 fruit3_pos = [random.randrange(1, (w//10)) * 10, random.randrange(1, (h//10)) * 10]
 fruit3_spawn = True
 # fruit4
-fruit4 = pygame.transform.scale(pygame.image.load("tsis8/snake/food4.png"), (20, 10))
+fruit4 = pygame.transform.scale(pygame.image.load("/Users/nieyrinn/Desktop/PP2/lab10/snake/food4.png"), (20, 10))
 fruit4_pos = [random.randrange(1, (w//10)) * 10, random.randrange(1, (h//10)) * 10]
 fruit4_spawn = True
 
@@ -82,7 +85,7 @@ def win():
     font = pygame.font.SysFont("Verdana", 15)
     win_surface = font.render("You won! You are going to the level " + str(LEVEL), True, BLACK)
     win_rect = win_surface.get_rect()
-    pygame.mixer.Sound("tsis8/snake/win.mp3").play()
+    pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/win.mp3").play()
     DISPLAYSURF.blit(win_surface, win_rect)
     pygame.display.flip()
 
@@ -96,19 +99,19 @@ def game_over():
     game_over_rect = game_over_surface.get_rect()
     game_over_rect.midtop = (w/2, h/3)
     
-    pygame.mixer.Sound("tsis8/snake/gameover.mp3").play()
+    pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/gameover.mp3").play()
     DISPLAYSURF.blit(game_over_surface, game_over_rect)
     pygame.display.flip()
 
     time.sleep(6)
     name = input("Enter you nickname to register you: ")
-    cur.execute("SELECT * FROM players WHERE username = %s", (name))
+    cur.execute("SELECT * FROM players WHERE username = %s", (name,))
     players = cur.fetchall()
     print(players)
     if len(players) == 0:
         cur.execute("INSERT INTO players (username, score, level) VALUES (%s, %s, %s)", (name, SCORE, LEVEL))
     else:
-        cur.execute("UPDATE players SET (score, level) VALUES (%s,%s) WHERE username = %s", (SCORE, LEVEL, name))
+        cur.execute("UPDATE players SET score = %s, level = %s WHERE username = %s", (SCORE, LEVEL, name))
     conn.commit()
 
     pygame.quit()
@@ -121,15 +124,15 @@ LIFETIME = Timer(10, killfood)
 LIFETIME.start()
 
 username = input("Enter your name: ")
-cur.execute("SELECT * FROM players WHERE username = %s", (username))
+cur.execute("SELECT * FROM players WHERE username = %s", (username,))
 players = cur.fetchall()
 print(players)
 if len(players) == 0:
   	print("Sign up in the system after game")
 else:
     print("Welcome back!")
-    SCORE = players[0][1]
-    LEVEL = players[0][2]
+    SCORE = int(players[0][2])
+    LEVEL = int(players[0][3])
 
 # Game loop
 while True:
@@ -175,24 +178,24 @@ while True:
         SCORE += 1
         x+=1
         fruit_spawn = False
-        pygame.mixer.Sound("tsis8/snake/newfood.mp3").play()
+        pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/newfood.mp3").play()
     elif snake_pos[0] == fruit2_pos[0] and snake_pos[1] == fruit2_pos[1]:
         SCORE += 2
         x+=2
         fruit2_spawn = False
-        pygame.mixer.Sound("tsis8/snake/newfood.mp3").play()
+        pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/newfood.mp3").play()
     elif snake_pos[0] == fruit3_pos[0] and snake_pos[1] == fruit3_pos[1]:
         SCORE += 1
         x+=1
         fruit3_spawn = False
-        pygame.mixer.Sound("tsis8/snake/newfood.mp3").play()
+        pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/newfood.mp3").play()
     elif snake_pos[0] == fruit4_pos[0] and snake_pos[1] == fruit4_pos[1]:
         SCORE += 3
         x+=3
         fruit4_spawn = False
         LIFETIME = Timer(10, killfood)
         LIFETIME.start()
-        pygame.mixer.Sound("tsis8/snake/newfood.mp3").play()
+        pygame.mixer.Sound("/Users/nieyrinn/Desktop/PP2/lab10/snake/newfood.mp3").play()
     else:
         snake_body.pop()
 
@@ -229,14 +232,11 @@ while True:
 
     # 5 fruits => next level + increase speed
     if x>=5:
-        SPEED=SPEED+(LEVEL*3)
+        SPEED=SPEED+(LEVEL*2)
         LEVEL+=1
         x=0
         win()
     score(SCORE, LEVEL)
     
-    cur.close()
-    conn.close()
-
     pygame.display.update()
     FramePerSec.tick(FPS)
